@@ -2,6 +2,8 @@ import "./style.css"
 
 import * as THREE from "three"
 
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+
 // 1. Scene
 // 2. Camera
 // 3. Renderer
@@ -23,17 +25,47 @@ renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 camera.position.setZ(30)
 
+// Add a torus with a geometry and material
 const geometry = new THREE.TorusGeometry(10, 3, 16, 100)
 const material = new THREE.MeshStandardMaterial({ color: 0xff6347 })
 const torus = new THREE.Mesh(geometry, material)
-
 scene.add(torus)
 
+// Add a point light and ambient light
 const pointLight = new THREE.PointLight(0xffffff)
 pointLight.position.set(20, 20, 20)
 
-scene.add(pointLight)
+const ambientLight = new THREE.AmbientLight(0xffffff)
+scene.add(pointLight, ambientLight)
 
+// Add a grid helper
+const gridHelper = new THREE.GridHelper(150, 50)
+scene.add(gridHelper)
+
+// Add controls to move around the scene
+const controls = new OrbitControls(camera, renderer.domElement)
+
+// Add stars
+function addStar() {
+  const geometry = new THREE.SphereGeometry(0.25, 24, 24)
+  const material = new THREE.MeshStandardMaterial({ color: 0xffffff })
+  const star = new THREE.Mesh(geometry, material)
+
+  const [x, y, z] = Array(3)
+    .fill()
+    .map(() => THREE.MathUtils.randFloatSpread(100))
+
+  star.position.set(x, y, z)
+  scene.add(star)
+}
+
+Array(200).fill().forEach(addStar)
+
+// Add space texture
+const spaceTexture = new THREE.TextureLoader().load("space.jpg")
+scene.background = spaceTexture
+
+// Animate
 function animate() {
   requestAnimationFrame(animate)
 
